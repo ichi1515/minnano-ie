@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>民宿 みんなの家</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Shippori+Mincho:wght@400;500;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410;
+    --washi: #f5f0e8;
+    --aged: #e8dfc8;
+    --vermillion: #c0392b;
+    --gold: #b8943f;
+    --stone: #8c7b6b;
+    --mist: #d4cfc6;
+    --moss: #4a5240;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--washi);
+    color: var(--ink);
+    font-family: 'Noto Serif JP', serif;
+    overflow-x: hidden;
+  }
+
+  /* ── Noise texture overlay ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 3rem;
+    background: rgba(245, 240, 232, 0.88);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(184, 148, 63, 0.25);
+  }
+
+  .nav-logo {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.3em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .nav-logo span {
+    font-size: 0.65rem;
+    display: block;
+    letter-spacing: 0.5em;
+    color: var(--stone);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    margin-top: 2px;
+  }
+
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2.5rem;
+  }
+
+  nav a {
+    font-size: 0.78rem;
+    letter-spacing: 0.25em;
+    color: var(--stone);
+    text-decoration: none;
+    transition: color 0.3s;
+    font-family: 'Noto Serif JP', serif;
+  }
+
+  nav a:hover { color: var(--vermillion); }
+
+  .nav-cta {
+    background: var(--vermillion);
+    color: var(--washi) !important;
+    padding: 0.55rem 1.4rem;
+    letter-spacing: 0.2em;
+    transition: background 0.3s !important;
+  }
+
+  .nav-cta:hover { background: #a93226 !important; color: var(--washi) !important; }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 80px;
+    overflow: hidden;
+  }
+
+  .hero-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6rem 4rem 4rem 6rem;
+    position: relative;
+  }
+
+  .hero-text::before {
+    content: none;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.5em;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+
+  .hero-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 4rem;
+    line-height: 1.35;
+    font-weight: 400;
+    margin-bottom: 1rem;
+    animation: fadeUp 1s ease both;
+  }
+
+  .hero-title-en {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--stone);
+    letter-spacing: 0.3em;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 1s 0.15s ease both;
+  }
+
+  .hero-desc {
+    font-size: 0.9rem;
+    line-height: 2;
+    color: var(--stone);
+    max-width: 380px;
+    margin-bottom: 3rem;
+    animation: fadeUp 1s 0.3s ease both;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1.2rem;
+    animation: fadeUp 1s 0.45s ease both;
+  }
+
+  .btn-primary {
+    background: var(--vermillion);
+    color: var(--washi);
+    border: none;
+    padding: 0.9rem 2.2rem;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+
+  .btn-primary:hover { background: #a93226; transform: translateY(-2px); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--mist);
+    padding: 0.9rem 2.2rem;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+  .hero-image {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-image-main {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: sepia(15%) contrast(1.05);
+    animation: zoomIn 8s ease both;
+  }
+
+  .hero-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, var(--washi) 0%, transparent 30%);
+  }
+
+  .hero-stamp {
+    position: absolute;
+    bottom: 3rem;
+    right: 3rem;
+    width: 90px;
+    height: 90px;
+    border: 2px solid var(--vermillion);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--vermillion);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    line-height: 1.8;
+    text-align: center;
+    animation: rotate 30s linear infinite;
+    font-family: 'Shippori Mincho', serif;
+  }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0 6rem;
+    margin: 1rem 0;
+  }
+
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: var(--mist);
+  }
+
+  .divider-kanji {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 0.9rem;
+    color: var(--gold);
+    letter-spacing: 0.3em;
+  }
+
+  /* ── SECTION BASE ── */
+  section {
+    padding: 6rem;
+  }
+
+  .section-header {
+    margin-bottom: 4rem;
+  }
+
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.6em;
+    color: var(--gold);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    margin-bottom: 0.8rem;
+  }
+
+  .section-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 2.2rem;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
+  .section-sub {
+    font-size: 0.82rem;
+    color: var(--stone);
+    margin-top: 0.8rem;
+    line-height: 1.9;
+  }
+
+  /* ── GALLERY ── */
+  #gallery {
+    background: var(--aged);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #gallery::before {
+    content: '庵';
+    position: absolute;
+    right: -2rem;
+    bottom: -4rem;
+    font-size: 20rem;
+    color: rgba(140, 123, 107, 0.07);
+    font-family: 'Shippori Mincho', serif;
+    pointer-events: none;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 260px 260px;
+    gap: 0.8rem;
+  }
+
+  .gallery-item {
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .gallery-item:first-child {
+    grid-row: span 2;
+  }
+
+  .gallery-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: sepia(10%) contrast(1.05);
+    transition: transform 0.6s ease, filter 0.6s ease;
+  }
+
+  .gallery-item:hover .gallery-img {
+    transform: scale(1.05);
+    filter: sepia(5%) contrast(1.1);
+  }
+
+  .gallery-label {
+    position: absolute;
+    bottom: 0.8rem;
+    left: 0.8rem;
+    background: rgba(245, 240, 232, 0.88);
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    padding: 0.3rem 0.7rem;
+    color: var(--ink);
+  }
+
+  /* ── MEALS ── */
+  #meals {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 0;
+  }
+
+  .meals-image {
+    height: 600px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .meals-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: sepia(10%) contrast(1.05);
+  }
+
+  .meals-content {
+    padding: 6rem 5rem;
+    background: var(--ink);
+    color: var(--washi);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .meals-content .section-label { color: var(--gold); }
+  .meals-content .section-title { color: var(--washi); }
+  .meals-content .section-sub { color: var(--mist); }
+
+  .amenity-list {
+    list-style: none;
+    margin-top: 2.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .amenity-list li {
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    color: var(--mist);
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+
+  .amenity-list li::before {
+    content: '✦';
+    color: var(--gold);
+    font-size: 0.5rem;
+  }
+
+  /* ── PLANS ── */
+  #plans {
+    background: var(--washi);
+  }
+
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .plan-card {
+    border: 1px solid var(--mist);
+    padding: 2.5rem;
+    position: relative;
+    transition: all 0.4s;
+    background: white;
+  }
+
+  .plan-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(26, 20, 16, 0.08);
+  }
+
+  .plan-card.featured {
+    border-color: var(--vermillion);
+    background: var(--ink);
+    color: var(--washi);
+  }
+
+  .plan-badge {
+    position: absolute;
+    top: -0.7rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--vermillion);
+    color: white;
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    padding: 0.25rem 1rem;
+  }
+
+  .plan-name {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.1em;
+  }
+
+  .plan-name-en {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.78rem;
+    color: var(--stone);
+    letter-spacing: 0.3em;
+    margin-bottom: 1.5rem;
+  }
+
+  .plan-card.featured .plan-name-en { color: var(--mist); }
+
+  .plan-price {
+    font-size: 0.75rem;
+    color: var(--stone);
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.15em;
+  }
+
+  .plan-card.featured .plan-price { color: var(--mist); }
+
+  .plan-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 0.2rem;
+  }
+
+  .plan-card.featured .plan-amount { color: var(--washi); }
+
+  .plan-amount span {
+    font-size: 0.85rem;
+    font-family: 'Noto Serif JP', serif;
+  }
+
+  .plan-unit {
+    font-size: 0.65rem;
+    color: var(--stone);
+    letter-spacing: 0.2em;
+    margin-bottom: 2rem;
+  }
+
+  .plan-card.featured .plan-unit { color: var(--mist); }
+
+  .plan-divider {
+    height: 1px;
+    background: var(--mist);
+    margin-bottom: 1.5rem;
+  }
+
+  .plan-card.featured .plan-divider { background: rgba(255,255,255,0.15); }
+
+  .plan-features {
+    list-style: none;
+    margin-bottom: 2rem;
+  }
+
+  .plan-features li {
+    font-size: 0.78rem;
+    letter-spacing: 0.15em;
+    padding: 0.4rem 0;
+    color: var(--stone);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .plan-card.featured .plan-features li { color: var(--mist); border-bottom-color: rgba(255,255,255,0.08); }
+
+  .plan-features li::before {
+    content: '◆';
+    font-size: 0.4rem;
+    color: var(--gold);
+    margin-top: 0.35rem;
+    flex-shrink: 0;
+  }
+
+  .plan-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--mist);
+    padding: 0.8rem;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: var(--ink);
+  }
+
+  .plan-btn:hover { border-color: var(--vermillion); color: var(--vermillion); }
+
+  .plan-card.featured .plan-btn {
+    background: var(--vermillion);
+    border-color: var(--vermillion);
+    color: white;
+  }
+
+  .plan-card.featured .plan-btn:hover { background: #a93226; }
+
+  /* ── BOOKING ── */
+  #booking {
+    background: var(--aged);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #booking::after {
+    content: '予約';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22rem;
+    color: rgba(140, 123, 107, 0.04);
+    font-family: 'Shippori Mincho', serif;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .booking-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .booking-inner .section-header { text-align: center; }
+
+  .booking-form {
+    background: white;
+    padding: 3.5rem;
+    border: 1px solid var(--mist);
+    box-shadow: 0 4px 30px rgba(26, 20, 16, 0.06);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group.full { grid-column: span 2; }
+
+  label {
+    font-size: 0.68rem;
+    letter-spacing: 0.35em;
+    color: var(--stone);
+  }
+
+  input, select, textarea {
+    border: 1px solid var(--mist);
+    background: var(--washi);
+    padding: 0.8rem 1rem;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.82rem;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.3s;
+    width: 100%;
+    appearance: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold);
+  }
+
+  textarea { resize: vertical; min-height: 100px; }
+
+  .form-submit {
+    width: 100%;
+    background: var(--vermillion);
+    color: white;
+    border: none;
+    padding: 1.1rem;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.4em;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 0.5rem;
+  }
+
+  .form-submit:hover { background: #a93226; }
+
+  .form-note {
+    text-align: center;
+    font-size: 0.68rem;
+    color: var(--stone);
+    margin-top: 1rem;
+    letter-spacing: 0.2em;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink);
+    color: var(--mist);
+    padding: 4rem 6rem;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 4rem;
+  }
+
+  .footer-brand .nav-logo {
+    color: var(--washi);
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 1.2rem;
+  }
+
+  .footer-brand p {
+    font-size: 0.78rem;
+    line-height: 2;
+    color: var(--stone);
+  }
+
+  footer h4 {
+    font-size: 0.68rem;
+    letter-spacing: 0.45em;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+
+  footer ul { list-style: none; }
+  footer ul li { margin-bottom: 0.8rem; }
+
+  footer ul a {
+    font-size: 0.78rem;
+    color: var(--stone);
+    text-decoration: none;
+    letter-spacing: 0.2em;
+    transition: color 0.3s;
+  }
+
+  footer ul a:hover { color: var(--gold); }
+
+  footer address {
+    font-style: normal;
+    font-size: 0.78rem;
+    color: var(--stone);
+    line-height: 2;
+    letter-spacing: 0.1em;
+  }
+
+  .footer-bottom {
+    background: #0e0c09;
+    padding: 1.2rem 6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-bottom p {
+    font-size: 0.65rem;
+    color: #5a5248;
+    letter-spacing: 0.2em;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes zoomIn {
+    from { transform: scale(1.08); }
+    to   { transform: scale(1); }
+  }
+
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    nav ul { display: none; }
+    #hero { grid-template-columns: 1fr; }
+    .hero-image { height: 45vh; order: -1; }
+    .hero-text { padding: 3rem 2rem; }
+    .hero-title { font-size: 2.5rem; }
+    section { padding: 4rem 2rem; }
+    .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+    .gallery-item:first-child { grid-row: span 1; }
+    #meals { grid-template-columns: 1fr; }
+    .meals-image { height: 300px; }
+    .meals-content { padding: 3rem 2rem; }
+    .plans-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: span 1; }
+    footer { grid-template-columns: 1fr; gap: 2rem; padding: 3rem 2rem; }
+    .footer-bottom { padding: 1rem 2rem; flex-direction: column; gap: 0.5rem; }
+    .section-divider { padding: 0 2rem; }
+  }
+  .taiken-item {
+    display:flex;flex-direction:row;align-items:center;gap:0.75rem;
+    padding:0.75rem 1rem;border:1px solid var(--mist);
+    cursor:pointer;transition:border-color 0.2s,background 0.2s;
+    margin-bottom:0.5rem;
+  }
+  .taiken-item:has(input:checked) { border-color:var(--vermillion);background:#fdf8f5; }
+  .taiken-item input { display:none; }
+  .taiken-check {
+    flex-shrink:0;width:18px;height:18px;
+    border:1.5px solid var(--mist);background:white;
+    display:flex;align-items:center;justify-content:center;
+    transition:all 0.15s;
+  }
+  .taiken-item:has(input:checked) .taiken-check {
+    background:var(--vermillion);border-color:var(--vermillion);
+  }
+  .taiken-item:has(input:checked) .taiken-check::after {
+    content:'';display:block;
+    width:5px;height:9px;
+    border-right:2px solid white;border-bottom:2px solid white;
+    transform:rotate(45deg) translate(-1px,-1px);
+  }
+  .taiken-text { display:flex;flex-direction:row;align-items:center;gap:1rem;flex:1;flex-wrap:wrap; }
+  .taiken-name { font-size:0.82rem;color:var(--ink);letter-spacing:0.1em;min-width:140px; }
+  .taiken-price { font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--vermillion);white-space:nowrap; }
+  .taiken-note { font-size:0.68rem;color:var(--stone);letter-spacing:0.1em;white-space:nowrap; }
+</style>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    みんなの家
+    <span>Minnano-ie Minshuku</span>
+  </a>
+  <ul>
+    <li><a href="#gallery">お部屋</a></li>
+    <li><a href="#meals">お食事</a></li>
+    <li><a href="#plans">ご料金</a></li>
+    <li><a href="#taiken">体験</a></li>
+    <li><a href="#booking" class="nav-cta">ご予約</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-text">
+    <p class="hero-eyebrow">山あいの民宿 — みんなの家</p>
+    <h1 class="hero-title">山の静寂に<br>包まれる、<br>一夜の安らぎ</h1>
+    <p class="hero-title-en">A night of stillness in the mountains</p>
+    <p class="hero-desc">
+      四季折々の自然に囲まれたみんなの家。地元の食材を活かした手料理と、
+      心のこもったおもてなしで、日常を離れた本物の休息をご提供します。
+    </p>
+    <div class="hero-actions">
+      <a href="#booking" class="btn-primary">ご予約はこちら</a>
+      <a href="#gallery" class="btn-outline">施設を見る</a>
+    </div>
+  </div>
+  <div class="hero-image">
+    <img class="hero-image-main"
+      src="minnano_entrance.jpg"
+      alt="みんなの家 外観">
+    <div class="hero-image-overlay"></div>
+  </div>
+</section>
+
+<div class="section-divider">
+  <div class="divider-line"></div>
+  <div class="divider-kanji">◆　おもてなし　◆</div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="section-header reveal">
+    <p class="section-label">Gallery — お部屋・施設</p>
+    <h2 class="section-title">くつろぎの空間</h2>
+    <p class="section-sub"></p>
+  </div>
+  <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:300px 300px;gap:0.8rem;">
+    <div class="gallery-item">
+      <img class="gallery-img" src="minnano_room.jpg" alt="客室">
+      <div class="gallery-label">◆ 客室</div>
+    </div>
+    <div class="gallery-item">
+      <img class="gallery-img" src="minnano_goemon.jpg" alt="五右衛門風呂">
+      <div class="gallery-label">◆ 五右衛門風呂</div>
+    </div>
+    <div class="gallery-item">
+      <img class="gallery-img" src="minnano_irori.jpg" alt="囲炉裏の間">
+      <div class="gallery-label">◆ 囲炉裏の間</div>
+    </div>
+    <div class="gallery-item">
+      <img class="gallery-img" src="minnano_kamado.jpg" alt="かまどご飯">
+      <div class="gallery-label">◆ かまどご飯</div>
+    </div>
+  </div>
+</section>
+
+<!-- MEALS & AMENITIES -->
+<section id="meals" style="padding:0;">
+  <div class="meals-image">
+    <img src="minnano_kaiseki.jpg" alt="地元食材の料理">
+  </div>
+  <div class="meals-content">
+    <div class="section-header">
+      <p class="section-label">Cuisine & Amenities — お食事・設備</p>
+      <h2 class="section-title" style="color:var(--washi);">山里の恵みを<br>食卓へ</h2>
+      <p class="section-sub">地元の農家・漁師と直接繋がり、その日最も新鮮な食材だけを使った懐石料理をお出しします。</p>
+    </div>
+    <ul class="amenity-list">
+      <li>素泊まり（食事は別途料金）</li>
+      <li>地酒・日本酒豊富</li>
+      <li>五右衛門風呂（男女別）</li>
+      <li>家族風呂</li>
+      <li>囲炉裏ラウンジ</li>
+      <li>タオル完備</li>
+      <li>無料Wi-Fi</li>
+      <li>駐車場完備（無料）</li>
+      <li>送迎サービス（要予約）</li>
+      <li>リラクゼーションサービス（要予約）</li>
+      <li>釣り・山歩きガイド</li>
+    </ul>
+  </div>
+</section>
+
+<!-- PLANS -->
+<section id="plans">
+  <div class="section-header reveal">
+    <p class="section-label">Plans & Rates — ご料金</p>
+    <h2 class="section-title">ご滞在プラン</h2>
+    <p class="section-sub">料金は曜日・時期によって異なります。下記の予約フォームで日程を選ぶと正確な金額をご確認いただけます。</p>
+  </div>
+
+  <!-- 料金タイプ説明 -->
+  <div class="reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2.5rem;">
+    <div style="text-align:center;padding:1.2rem;border:1px solid var(--mist);background:white;">
+      <p style="font-size:0.65rem;letter-spacing:0.4em;color:var(--gold);font-family:'Cormorant Garamond',serif;font-style:italic;margin-bottom:0.5rem;">Weekday</p>
+      <p style="font-family:'Shippori Mincho',serif;font-size:1rem;margin-bottom:0.4rem;">平　日</p>
+      <p style="font-size:0.68rem;color:var(--stone);letter-spacing:0.15em;">日〜木曜</p>
+    </div>
+    <div style="text-align:center;padding:1.2rem;border:1px solid var(--mist);background:white;">
+      <p style="font-size:0.65rem;letter-spacing:0.4em;color:var(--gold);font-family:'Cormorant Garamond',serif;font-style:italic;margin-bottom:0.5rem;">Pre-Holiday</p>
+      <p style="font-family:'Shippori Mincho',serif;font-size:1rem;margin-bottom:0.4rem;">休日前</p>
+      <p style="font-size:0.68rem;color:var(--stone);letter-spacing:0.15em;">金・土曜</p>
+    </div>
+    <div style="text-align:center;padding:1.2rem;border:1px solid var(--mist);background:white;">
+      <p style="font-size:0.65rem;letter-spacing:0.4em;color:var(--gold);font-family:'Cormorant Garamond',serif;font-style:italic;margin-bottom:0.5rem;">Long Holiday</p>
+      <p style="font-family:'Shippori Mincho',serif;font-size:1rem;margin-bottom:0.4rem;">大型連休前</p>
+      <p style="font-size:0.68rem;color:var(--stone);letter-spacing:0.15em;">盆・正月・GW</p>
+    </div>
+  </div>
+
+  <div class="plans-grid reveal" style="grid-template-columns:1fr 1fr;">
+
+    <div class="plan-card featured">
+      <div class="plan-badge">一棟貸し</div>
+      <p class="plan-name">一棟貸し</p>
+      <p class="plan-name-en">Exclusive Rental</p>
+      <p class="plan-price">1泊 / 最大16名（税込）</p>
+      <div style="margin:1rem 0 0.3rem;">
+        <p class="plan-amount" style="font-size:2rem;">35,<span>000</span></p>
+        <p class="plan-unit">円〜（平日・4名まで）</p>
+      </div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>5名〜：+¥8,000 / 人（平日）</li>
+        <li>休日前：¥45,000〜</li>
+        <li>大型連休前：¥55,000〜</li>
+        <li>施設まるごと一棟貸し</li>
+        <li>BBQ・囲炉裏ご利用可</li>
+        <li>素泊まり（食事は別途料金）</li>
+      <p class="plan-name-en">Price Calculator</p>
+      <p class="plan-price" style="margin-bottom:1rem;">日程・人数で正確な金額を確認</p>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>チェックイン日を選択</li>
+        <li>チェックアウト日を選択</li>
+        <li>人数を入力</li>
+        <li>泊ごとの内訳を表示</li>
+        <li>合計金額を自動計算</li>
+      </ul>
+      <button class="plan-btn" onclick="scrollToBooking()">シミュレーターを使う</button>
+    </div>
+
+  </div>
+</section>
+
+<div class="section-divider">
+  <div class="divider-line"></div>
+  <div class="divider-kanji">◆　体験　◆</div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- EXPERIENCE -->
+<section id="taiken" style="background:var(--aged);">
+  <div class="section-header reveal">
+    <p class="section-label">Experience — 体験メニュー</p>
+    <h2 class="section-title">山里の体験</h2>
+    <p class="section-sub">薪割り・囲炉裏・BBQ・サウナ・茶摘みなど、自然の中ならではの体験をご用意しています。<br>基本的に前日までにお電話でのご予約をお願いします。</p>
+  </div>
+
+  <div class="reveal" style="max-width:860px;margin:0 auto;">
+
+    <!-- 体験テーブル用スタイル -->
+    <style>
+      .exp-table { width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:2.5rem; }      .exp-table th { background:var(--ink); color:var(--washi); font-weight:400; padding:10px 14px; border:1px solid rgba(255,255,255,0.1); text-align:left; letter-spacing:0.15em; white-space:nowrap; }
+      .exp-table td { padding:10px 14px; border:1px solid var(--mist); color:var(--ink); vertical-align:top; line-height:1.7; background:white; }
+      .exp-table tr:nth-child(even) td { background:#faf7f2; }
+      .exp-sub { font-size:0.72rem; color:var(--stone); margin-top:3px; line-height:1.7; }
+      .exp-tag { display:inline-block; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin:0 4px 2px 0; font-weight:500; letter-spacing:0.1em; }
+      .tag-amber  { background:#faeeda; color:#854f0b; }
+      .tag-coral  { background:#faece7; color:#993c1d; }
+      .tag-teal   { background:#e1f5ee; color:#0f6e56; }
+      .tag-green  { background:#eaf3de; color:#3b6d11; }
+      .tag-purple { background:#eeedfe; color:#534ab7; }
+      .exp-section-title { font-family:'Shippori Mincho',serif; font-size:1rem; font-weight:400; letter-spacing:0.2em; color:var(--ink); margin:0 0 0.75rem; padding-bottom:6px; border-bottom:1px solid var(--mist); }
+    </style>
+
+    <p class="exp-section-title">体験メニュー一覧</p>
+    <div style="overflow-x:auto;margin-bottom:2rem;">
+      <table class="exp-table" style="min-width:580px;">
+        <thead>
+          <tr>
+            <th style="width:180px;">体験名</th>
+            <th style="width:110px;">料金</th>
+            <th style="width:90px;">人数</th>
+            <th style="width:80px;">所要時間</th>
+            <th>含まれるもの・備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="exp-tag tag-amber">入浴</span>薪割り・五右衛門風呂</td>
+            <td>5,000円</td>
+            <td>〜4名</td>
+            <td>2時間</td>
+            <td>薪代込み、タオルあり<div class="exp-sub">15時まで</div></td>
+          </tr>
+          <tr>
+            <td><span class="exp-tag tag-coral">食事</span>囲炉裏</td>
+            <td>3,000円</td>
+            <td>〜6名</td>
+            <td>2時間</td>
+            <td>炭代込み<div class="exp-sub">ご飯セットB（+2,000円/人）<br>ご飯・みそ汁・漬け物・おかず1品</div></td>
+          </tr>
+          <tr>
+            <td><span class="exp-tag tag-coral">食事</span>薪割り・釜戸ごはん</td>
+            <td>5,000円</td>
+            <td>制限なし</td>
+            <td>2時間</td>
+            <td>薪代込み<div class="exp-sub">ご飯セットA（+1,000円/人）<br>ご飯・みそ汁・漬け物</div></td>
+          </tr>
+          <tr>
+            <td><span class="exp-tag tag-teal">サウナ</span>テントサウナ</td>
+            <td>5,000円</td>
+            <td>〜2名</td>
+            <td>2時間</td>
+            <td>薪代込み</td>
+          </tr>
+          <tr>
+            <td><span class="exp-tag tag-green">BBQ</span>BBQ 大型</td>
+            <td>5,000円</td>
+            <td>6名以上</td>
+            <td>2時間</td>
+            <td rowspan="3">炭代込み<div class="exp-sub">食材 2,000円/人<br>ご飯セットA 1,000円/人<br>（ご飯・みそ汁・漬け物）<br>延長 2,000円/時間<br>追加炭 500円</div></td>
+          </tr>
+          <tr>
+            <td><span class="exp-tag tag-green">BBQ</span>BBQ 中型</td>
+            <td>3,000円</td>
+            <td>3〜5名</td>
+            <td>2時間</td>
+          </tr>
+          <tr>
+            <td><span class="exp-tag tag-green">BBQ</span>BBQ 小型</td>
+            <td>2,000円</td>
+            <td>〜2名</td>
+            <td>2時間</td>
+          </tr>
+          <tr>
+            <td><span class="exp-tag tag-purple">自然</span>茶摘み・茶葉作り</td>
+            <td>3,000円/人</td>
+            <td>制限なし</td>
+            <td>2時間</td>
+            <td>お茶試飲</td>
+          </tr>
+          <tr>
+            <td><span class="exp-tag tag-purple">自然</span>山菜採り</td>
+            <td>3,000円/人</td>
+            <td>制限なし</td>
+            <td>2時間</td>
+            <td>天ぷら試食</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="exp-section-title">食事オプション（別途）</p>
+    <div style="overflow-x:auto;">
+      <table class="exp-table" style="min-width:480px;">
+        <thead>
+          <tr>
+            <th style="width:180px;">メニュー</th>
+            <th style="width:120px;">料金</th>
+            <th style="width:100px;">条件</th>
+            <th>備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>簡単ご飯<div class="exp-sub">カレー・パスタなど</div></td>
+            <td>2,000円/人</td>
+            <td>制限なし</td>
+            <td>材料費＋調理30分以内、前日締め切り</td>
+          </tr>
+          <tr>
+            <td>地元食材懐石<div class="exp-sub">田舎御膳</div></td>
+            <td>5,000円/人</td>
+            <td>2名以上</td>
+            <td>2日前までに予約</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<div class="section-divider">
+  <div class="divider-line"></div>
+  <div class="divider-kanji">◆　ご予約　◆</div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- BOOKING -->
+<section id="booking">
+  <div class="booking-inner">
+    <div class="section-header reveal">
+      <p class="section-label">Reservation — ご予約</p>
+      <h2 class="section-title">ご予約・お問い合わせ</h2>
+      <p class="section-sub">お電話（0954-62-8444）または下記フォームよりお気軽にどうぞ。<br>
+      日程・人数を選ぶと料金が自動で計算されます。<br>
+      <span style="font-size:0.78rem;color:var(--vermillion);letter-spacing:0.15em;">※ 古民家保護のためペット不可</span></p>
+    </div>
+    <div class="booking-form reveal">
+
+      <!-- 予約タイプ -->
+      <div style="margin-bottom:1.5rem;">
+        <label style="display:block;margin-bottom:0.6rem;">予約タイプ</label>
+        <div style="padding:0.75rem;font-family:'Noto Serif JP',serif;font-size:0.78rem;letter-spacing:0.2em;border:1px solid var(--vermillion);background:var(--vermillion);color:white;text-align:center;">
+          一棟貸し（〜16名）
+        </div>
+      </div>
+
+      <!-- 日程・人数 -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="checkin">チェックイン *</label>
+          <input type="date" id="checkin" onchange="calcFee()">
+        </div>
+        <div class="form-group">
+          <label for="checkout">チェックアウト *</label>
+          <input type="date" id="checkout" onchange="calcFee()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="guests">人数 *</label>
+          <input type="number" id="guests" value="4" min="1" max="16" onchange="calcFee()"
+            style="font-family:'Noto Serif JP',serif;">
+        </div>
+        <div class="form-group" style="display:flex;flex-direction:column;justify-content:flex-end;">
+          <!-- 泊数バッジ -->
+          <div id="nights-badge" style="border:1px solid var(--mist);background:var(--washi);padding:0.8rem 1rem;font-size:0.82rem;color:var(--stone);letter-spacing:0.15em;text-align:center;">
+            — 泊
+          </div>
+        </div>
+      </div>
+
+      <!-- 料金サマリー -->
+      <div id="fee-summary" style="display:none;margin-bottom:1.5rem;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:0.8rem;">
+          <div style="text-align:center;border:1px solid var(--mist);padding:0.8rem;background:var(--washi);">
+            <p style="font-size:0.6rem;letter-spacing:0.3em;color:var(--stone);margin-bottom:0.3rem;">泊数</p>
+            <p id="s-nights" style="font-size:1.3rem;font-family:'Cormorant Garamond',serif;color:var(--ink);">—</p>
+          </div>
+          <div style="text-align:center;border:1px solid var(--mist);padding:0.8rem;background:var(--washi);">
+            <p style="font-size:0.6rem;letter-spacing:0.3em;color:var(--stone);margin-bottom:0.3rem;">人数</p>
+            <p id="s-guests" style="font-size:1.3rem;font-family:'Cormorant Garamond',serif;color:var(--ink);">—</p>
+          </div>
+          <div style="text-align:center;border:1px solid var(--mist);padding:0.8rem;background:var(--washi);">
+            <p style="font-size:0.6rem;letter-spacing:0.3em;color:var(--stone);margin-bottom:0.3rem;">1泊平均</p>
+            <p id="s-avg" style="font-size:1.3rem;font-family:'Cormorant Garamond',serif;color:var(--ink);">—</p>
+          </div>
+        </div>
+        <!-- 内訳テーブル -->
+        <div id="fee-breakdown" style="border:1px solid var(--mist);margin-bottom:0.8rem;"></div>
+        <!-- 合計 -->
+        <div style="background:var(--ink);color:white;padding:1.2rem 1.5rem;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <p style="font-size:0.68rem;letter-spacing:0.35em;opacity:0.7;margin-bottom:4px;">合計金額（税込）</p>
+            <p id="s-sub" style="font-size:0.6rem;opacity:0.5;letter-spacing:0.2em;"></p>
+          </div>
+          <p id="s-total" style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;"></p>
+        </div>
+      </div>
+
+      <!-- 体験メニュー -->
+      <div style="margin-bottom:1.5rem;">
+        <label style="display:block;font-family:'Shippori Mincho',serif;font-size:0.78rem;letter-spacing:0.2em;color:var(--stone);margin-bottom:0.75rem;">体験メニュー（複数選択可）</label>
+        <div style="display:flex;flex-direction:column;" id="taiken-checks">
+          <label class="taiken-item" data-price="5000" data-label="薪割り・五右衛門風呂">
+            <input type="checkbox" onchange="calcFee()"><div class="taiken-check"></div>
+            <div class="taiken-text"><span class="taiken-name">薪割り・五右衛門風呂</span>
+            <span class="taiken-price">¥5,000</span>
+            <span class="taiken-note">〜4名 / 2時間</span></div>
+          </label>
+          <label class="taiken-item" data-price="3000" data-label="囲炉裏">
+            <input type="checkbox" onchange="calcFee()"><div class="taiken-check"></div>
+            <div class="taiken-text"><span class="taiken-name">囲炉裏</span>
+            <span class="taiken-price">¥3,000</span>
+            <span class="taiken-note">〜6名 / 2時間</span></div>
+          </label>
+          <label class="taiken-item" data-price="5000" data-label="薪割り・釜戸ごはん">
+            <input type="checkbox" onchange="calcFee()"><div class="taiken-check"></div>
+            <div class="taiken-text"><span class="taiken-name">薪割り・釜戸ごはん</span>
+            <span class="taiken-price">¥5,000</span>
+            <span class="taiken-note">制限なし / 2時間</span></div>
+          </label>
+          <label class="taiken-item" data-price="5000" data-label="テントサウナ">
+            <input type="checkbox" onchange="calcFee()"><div class="taiken-check"></div>
+            <div class="taiken-text"><span class="taiken-name">テントサウナ</span>
+            <span class="taiken-price">¥5,000</span>
+            <span class="taiken-note">〜2名 / 2時間</span></div>
+          </label>
+          <label class="taiken-item" data-price="5000" data-label="BBQ 大型">
+            <input type="checkbox" onchange="calcFee()"><div class="taiken-check"></div>
+            <div class="taiken-text"><span class="taiken-name">BBQ 大型</span>
+            <span class="taiken-price">¥5,000</span>
+            <span class="taiken-note">6名以上 / 2時間</span></div>
+          </label>
+          <label class="taiken-item" data-price="3000" data-label="BBQ 中型">
+            <input type="checkbox" onchange="calcFee()"><div class="taiken-check"></div>
+            <div class="taiken-text"><span class="taiken-name">BBQ 中型</span>
+            <span class="taiken-price">¥3,000</span>
+            <span class="taiken-note">3〜5名 / 2時間</span></div>
+          </label>
+          <label class="taiken-item" data-price="2000" data-label="BBQ 小型">
+            <input type="checkbox" onchange="calcFee()"><div class="taiken-check"></div>
+            <div class="taiken-text"><span class="taiken-name">BBQ 小型</span>
+            <span class="taiken-price">¥2,000</span>
+            <span class="taiken-note">〜2名 / 2時間</span></div>
+          </label>
+          <label class="taiken-item" data-price="3000" data-label="茶摘み・茶葉作り" data-per-person="true">
+            <input type="checkbox" onchange="calcFee()"><div class="taiken-check"></div>
+            <div class="taiken-text"><span class="taiken-name">茶摘み・茶葉作り</span>
+            <span class="taiken-price">¥3,000/人</span>
+            <span class="taiken-note">制限なし / 2時間</span></div>
+          </label>
+          <label class="taiken-item" data-price="3000" data-label="山菜採り" data-per-person="true">
+            <input type="checkbox" onchange="calcFee()"><div class="taiken-check"></div>
+            <div class="taiken-text"><span class="taiken-name">山菜採り</span>
+            <span class="taiken-price">¥3,000/人</span>
+            <span class="taiken-note">制限なし / 2時間</span></div>
+          </label>
+        </div>
+        <!-- 体験小計 -->
+        <div id="taiken-subtotal" style="display:none;margin-top:0.75rem;border:1px solid var(--mist);padding:0.75rem 1rem;font-size:0.8rem;color:var(--stone);letter-spacing:0.15em;">
+          体験合計：<span id="taiken-total-amount" style="color:var(--ink);font-weight:500;"></span>
+        </div>
+      </div>
+
+      <!-- お客様情報 -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">お名前 *</label>
+          <input type="text" id="name" placeholder="山田 花子">
+        </div>
+        <div class="form-group">
+          <label for="email">メールアドレス *</label>
+          <input type="email" id="email" placeholder="example@mail.com">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group full">
+          <label for="phone">電話番号</label>
+          <input type="tel" id="phone" placeholder="090-0000-0000">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group full">
+          <label for="message">ご要望・アレルギー等</label>
+          <textarea id="message" placeholder="食物アレルギー、お部屋のご希望、送迎のご要望など、何でもお気軽にお書きください。"></textarea>
+        </div>
+      </div>
+      <button class="form-submit" onclick="handleSubmit()">予約リクエストを送る</button>
+      <p class="form-note">※ 送信後、担当者より確認のご連絡をさしあげます。</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <span class="nav-logo">みんなの家<span style="color:var(--stone)">Minnano-ie</span></span>
+    <p>山あいに佇む小さな民宿。地元の食材を使った手料理と、<br>四季折々の体験で、ゆったりとした時間をお届けします。</p>
+  </div>
+  <div>
+    <h4>Navigation</h4>
+    <ul>
+      <li><a href="#gallery">お部屋・施設</a></li>
+      <li><a href="#meals">お食事・アメニティ</a></li>
+      <li><a href="#plans">ご料金・プラン</a></li>
+      <li><a href="#taiken">体験メニュー</a></li>
+      <li><a href="#booking">ご予約・お問い合わせ</a></li>
+    </ul>
+  </div>
+  <div>
+    <h4>Access & Info</h4>
+    <address>
+      〒849-1324<br>
+      佐賀県鹿島市飯田2721-67<br><br>
+      代表：永吉 絹子<br>
+      TEL: 0954-62-8444
+    </address>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <p>© 2024 みんなの家 Minnano-ie. All rights reserved.</p>
+  <p>プライバシーポリシー　｜　特定商取引法に基づく表記</p>
+</div>
+
+<script>
+  // ── Scroll reveal ──
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 100);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  function scrollToBooking() {
+    document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // ── 料金計算ロジック ──
+  const RATES_GROUP    = { heijitsu: 35000, kyujitsu: 45000, renkyuu: 55000 };
+  const RATES_PERSONAL = { heijitsu: 19800, kyujitsu: 24800, renkyuu: 29800 };
+  const EXTRA_GROUP    = { heijitsu: 8000,  kyujitsu: 9000,  renkyuu: 9000  };
+  const BASE_GUESTS = 4, MAX_GUESTS = 16;
+
+  const HOLIDAYS = new Set([
+    '2025-01-01','2025-01-13','2025-02-11','2025-02-23','2025-02-24',
+    '2025-03-20','2025-04-29','2025-05-03','2025-05-04','2025-05-05','2025-05-06',
+    '2025-07-21','2025-08-11','2025-09-15','2025-09-22','2025-09-23',
+    '2025-10-13','2025-11-03','2025-11-23','2025-11-24',
+    '2026-01-01','2026-01-12','2026-02-11','2026-02-23','2026-03-20',
+    '2026-04-29','2026-05-03','2026-05-04','2026-05-05','2026-05-06',
+    '2026-07-20','2026-08-11','2026-09-21','2026-09-22','2026-09-23',
+    '2026-10-12','2026-11-03','2026-11-23',
+    '2027-01-01','2027-01-11','2027-02-11','2027-02-23','2027-03-20',
+    '2027-04-29','2027-05-03','2027-05-04','2027-05-05',
+    '2027-07-19','2027-08-11','2027-09-20','2027-09-23',
+    '2027-10-11','2027-11-03','2027-11-23'
+  ]);
+  const LARGE_RANGES = [
+    ['2025-01-01','2025-01-05'],['2025-04-26','2025-05-06'],
+    ['2025-08-10','2025-08-17'],['2025-12-28','2026-01-05'],
+    ['2026-01-01','2026-01-05'],['2026-04-25','2026-05-06'],
+    ['2026-08-09','2026-08-16'],['2026-12-27','2027-01-05'],
+    ['2027-01-01','2027-01-05'],['2027-04-29','2027-05-05'],
+    ['2027-08-08','2027-08-15'],['2027-12-29','2028-01-05'],
+  ];
+
+  function toKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function isLargeHoliday(d){ const k=toKey(d); return LARGE_RANGES.some(([s,e])=>k>=s&&k<=e); }
+  function isHoliday(d){ return HOLIDAYS.has(toKey(d)); }
+  function getDayType(d){
+    if(isLargeHoliday(d)){ const n=new Date(d);n.setDate(n.getDate()+1);return isLargeHoliday(n)?'renkyuu':'heijitsu'; }
+    const dow=d.getDay(),hol=isHoliday(d);
+    if(hol){ const n=new Date(d);n.setDate(n.getDate()+1);if(!(n.getDay()===0||n.getDay()===6||isHoliday(n)))return 'heijitsu'; }
+    if(dow===5||dow===6||hol)return 'kyujitsu';
+    const n=new Date(d);n.setDate(n.getDate()+1);
+    if(isHoliday(n)||n.getDay()===6||n.getDay()===0)return 'kyujitsu';
+    return 'heijitsu';
+  }
+  const TYPE_LABEL={heijitsu:'平日',kyujitsu:'休日前',renkyuu:'大型連休前'};
+  const TYPE_COLOR={heijitsu:'#4a7c59',kyujitsu:'#c47a1e',renkyuu:'#b04040'};
+  const TYPE_BG   ={heijitsu:'#e8f3ec',kyujitsu:'#fdf0dc',renkyuu:'#fbeaea'};
+  const DOW_JP=['日','月','火','水','木','金','土'];
+  function fmt(n){ return '¥'+Math.round(n).toLocaleString('ja-JP'); }
+  function fmtDate(s){ const d=new Date(s+'T00:00:00');return (d.getMonth()+1)+'月'+d.getDate()+'日（'+DOW_JP[d.getDay()]+'）'; }
+
+  let bookingType='group', currentTotal=0, nightRowsData=[];
+
+  function setType(t){
+    bookingType=t;
+    const gBtn=document.getElementById('btn-group');
+    const pBtn=document.getElementById('btn-personal');
+    if(t==='group'){
+      gBtn.style.background='var(--vermillion)';gBtn.style.color='white';gBtn.style.borderColor='var(--vermillion)';
+      pBtn.style.background='transparent';pBtn.style.color='var(--ink)';pBtn.style.borderColor='var(--mist)';
+      document.getElementById('guests').max=16;
+    } else {
+      pBtn.style.background='var(--vermillion)';pBtn.style.color='white';pBtn.style.borderColor='var(--vermillion)';
+      gBtn.style.background='transparent';gBtn.style.color='var(--ink)';gBtn.style.borderColor='var(--mist)';
+      document.getElementById('guests').max=999;
+    }
+    calcFee();
+  }
+
+  (function initDates(){
+    const today=new Date(),tom=new Date(today);tom.setDate(tom.getDate()+1);
+    const f=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    document.getElementById('checkin').value=f(today);
+    document.getElementById('checkout').value=f(tom);
+    calcFee();
+  })();
+
+  function calcTaiken(guests){
+    let total=0;
+    document.querySelectorAll('#taiken-checks .taiken-item').forEach(item=>{
+      const cb=item.querySelector('input[type=checkbox]');
+      if(!cb.checked)return;
+      const price=parseInt(item.dataset.price)||0;
+      const perPerson=item.dataset.perPerson==='true';
+      total += perPerson ? price*guests : price;
+    });
+    const sub=document.getElementById('taiken-subtotal');
+    if(total>0){
+      sub.style.display='block';
+      document.getElementById('taiken-total-amount').textContent=fmt(total);
+    } else {
+      sub.style.display='none';
+    }
+    return total;
+  }
+
+  function calcFee(){
+    const cin=document.getElementById('checkin').value;
+    const cout=document.getElementById('checkout').value;
+    let guests=parseInt(document.getElementById('guests').value)||1;
+    if(bookingType==='group'&&guests>MAX_GUESTS){guests=MAX_GUESTS;document.getElementById('guests').value=MAX_GUESTS;}
+    guests=Math.max(1,guests);
+
+    if(!cin||!cout||cin>=cout){
+      document.getElementById('fee-summary').style.display='none';
+      document.getElementById('nights-badge').textContent='— 泊';
+      currentTotal=0;nightRowsData=[];return;
+    }
+
+    const start=new Date(cin+'T00:00:00'),end=new Date(cout+'T00:00:00');
+    const nights=Math.round((end-start)/86400000);
+    const extra=bookingType==='group'?Math.max(0,guests-BASE_GUESTS):0;
+    let total=0;nightRowsData=[];
+
+    for(let i=0;i<nights;i++){
+      const d=new Date(start);d.setDate(d.getDate()+i);
+      const type=getDayType(d);
+      const nt=bookingType==='group'?RATES_GROUP[type]+extra*EXTRA_GROUP[type]:RATES_PERSONAL[type]*guests;
+      total+=nt;nightRowsData.push({d,type,nightTotal:nt});
+    }
+    currentTotal=total;
+
+    document.getElementById('nights-badge').textContent=nights+' 泊';
+    document.getElementById('s-nights').textContent=nights+'泊';
+    document.getElementById('s-guests').textContent=guests+'名';
+    document.getElementById('s-avg').textContent=fmt(total/nights);
+
+    // 体験料金を加算
+    const taikenTotal = calcTaiken(guests);
+    const grandTotal = total + taikenTotal;
+
+    document.getElementById('s-total').textContent=fmt(grandTotal);
+
+    let sub='';
+    if(bookingType==='group'&&extra>0)sub='4名超 +'+extra+'名分の追加料金を含む';
+    if(taikenTotal>0)sub+=(sub?'　／　':'')+'体験 '+fmt(taikenTotal)+' 含む';
+    document.getElementById('s-sub').textContent=sub;
+
+    // 内訳テーブル（山月庵スタイル）
+    let html='<table style="width:100%;border-collapse:collapse;font-size:0.78rem;">';
+    html+='<thead><tr style="border-bottom:1px solid var(--mist);">';
+    html+='<th style="text-align:left;padding:0.6rem 1rem;color:var(--stone);font-weight:400;letter-spacing:0.2em;">日付</th>';
+    html+='<th style="text-align:left;padding:0.6rem 0.5rem;color:var(--stone);font-weight:400;letter-spacing:0.2em;">タイプ</th>';
+    html+='<th style="text-align:right;padding:0.6rem 1rem;color:var(--stone);font-weight:400;letter-spacing:0.2em;">料金</th>';
+    html+='</tr></thead><tbody>';
+    for(const r of nightRowsData){
+      const dow=DOW_JP[r.d.getDay()];
+      const lbl=(r.d.getMonth()+1)+'/'+(r.d.getDate())+'（'+dow+'）';
+      html+='<tr style="border-bottom:1px solid #f0ebe3;">';
+      html+='<td style="padding:0.6rem 1rem;color:var(--ink);">'+lbl+'</td>';
+      html+='<td style="padding:0.6rem 0.5rem;"><span style="display:inline-block;font-size:0.65rem;padding:2px 8px;border-radius:2px;background:'+TYPE_BG[r.type]+';color:'+TYPE_COLOR[r.type]+';">'+TYPE_LABEL[r.type]+'</span></td>';
+      html+='<td style="padding:0.6rem 1rem;text-align:right;font-family:\'Cormorant Garamond\',serif;font-size:1rem;color:var(--ink);">'+fmt(r.nightTotal)+'</td>';
+      html+='</tr>';
+    }
+    html+='</tbody></table>';
+    document.getElementById('fee-breakdown').innerHTML=html;
+    document.getElementById('fee-summary').style.display='block';
+  }
+
+  // EmailJS設定
+  const EJS_SERVICE  = 'service_maqpn3m';
+  const EJS_OWNER    = 'template_vkvzl8o';
+  const EJS_THANKS   = 'template_ams7tef';
+  const EJS_KEY      = 'HDKC-yjDDKrvcYeqA';
+  emailjs.init(EJS_KEY);
+
+  async function handleSubmit(){
+    const name    = document.getElementById('name').value.trim();
+    const email   = document.getElementById('email').value.trim();
+    const phone   = document.getElementById('phone').value.trim();
+    const message = document.getElementById('message').value.trim();
+    const cin     = document.getElementById('checkin').value;
+    const cout    = document.getElementById('checkout').value;
+    const guests  = document.getElementById('guests').value;
+
+    if(!name||!email){ alert('お名前・メールアドレスは必須です。'); return; }
+    if(!cin||!cout||cin>=cout){ alert('チェックイン・アウト日を正しくご入力ください。'); return; }
+
+    // 体験メニューの選択内容をテキスト化
+    const taikenList = [];
+    document.querySelectorAll('#taiken-checks .taiken-item').forEach(item=>{
+      if(item.querySelector('input[type=checkbox]').checked){
+        taikenList.push(item.dataset.label);
+      }
+    });
+    const taikenText = taikenList.length > 0 ? taikenList.join('、') : 'なし';
+
+    const typeLabel = bookingType==='group'?'貸切':'個人';
+    const nights    = nightRowsData.length;
+    const taikenTotal = calcTaiken(guests);
+    const grandTotal  = currentTotal + taikenTotal;
+
+    const params = {
+      name,
+      email,
+      phone:   phone||'未記入',
+      checkin: fmtDate(cin),
+      checkout:fmtDate(cout),
+      nights:  nights+'泊',
+      guests:  guests+'名',
+      type:    typeLabel,
+      taiken:  taikenText,
+      total:   fmt(grandTotal),
+      message: message||'なし',
+    };
+
+    const btn = document.querySelector('.form-submit');
+    btn.textContent='送信中...';btn.disabled=true;
+
+    try{
+      await emailjs.send(EJS_SERVICE, EJS_OWNER,  params);
+      await emailjs.send(EJS_SERVICE, EJS_THANKS, params);
+      alert(name+' 様、予約リクエストを受け付けました。\n確認メールをお送りしましたのでご確認ください。');
+      btn.textContent='予約リクエストを送る';btn.disabled=false;
+    }catch(e){
+      console.error(e);
+      alert('送信に失敗しました。時間をおいて再度お試しください。');
+      btn.textContent='予約リクエストを送る';btn.disabled=false;
+    }
+  }
+</script>
+</body>
+</html>
